@@ -4,7 +4,7 @@ setting up bosh-lite on GCP
 and deploying cf-deployment to it.
 
 ## Resources
-- [Terraform template](https://github.com/cloudfoundry/runtime-ci/tasks/bosh-create-env/terraform/bosh-lite/terraform.tf)
+- [Terraform template](https://github.com/cloudfoundry/runtime-ci/blob/master/tasks/bosh-create-env/terraform/bosh-lite/terraform.tf)
 - [bosh-deployment](https://github.com/cloudfoundry/bosh-deployment)
 - [BOSH CLI](https://github.com/cloudfoundry/bosh-cli)
 
@@ -98,7 +98,7 @@ before you run the `create-env` command:
 ```
 echo "project_id: $GCP_PROJECT_ID" >> env-repo/bosh-vars.yml
 echo "gcp_credentials_json: '$GCP_SERVICE_ACCOUNT_KEY'" >> env-repo/bosh-vars.yml
-echo "gcp_zone: $GCP_ZONE" >> env-repo/bosh-vars.yml
+echo "zone: $GCP_ZONE" >> env-repo/bosh-vars.yml
 echo "director_name: $DIRECTOR_NAME" >> env-repo/bosh-vars.yml
 echo "external_ip: $EXTERNAL_IP" >> env-repo/bosh-vars.yml
 echo "network: $NETWORK" >> env-repo/bosh-vars.yml

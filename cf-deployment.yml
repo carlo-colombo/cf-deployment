@@ -27,7 +27,7 @@ instance_groups:
         api: "https://api.((system_domain))"
         apps_domain: "((system_domain))"
         user: admin
-        password: "((uaa_scim_users_admin_password))"
+        password: "((cf_admin_password))"
         org: cf_smoke_tests_org
         space: cf_smoke_tests_space
         cf_dial_timeout_in_seconds: 300
@@ -50,7 +50,6 @@ instance_groups:
   - name: consul_agent
     release: consul
     consumes:
-      consul: nil
       consul_common: {from: consul_common_link}
       consul_server: {from: consul_server_link}
       consul_client: {from: consul_client_link}
@@ -94,14 +93,10 @@ instance_groups:
   stemcell: default
   networks:
   - name: default
-    static_ips: &nats_machines
-    - 10.0.31.191
-    - 10.0.47.191
   jobs:
   - name: consul_agent
     release: consul
     consumes:
-      consul: nil
       consul_common: {from: consul_common_link}
       consul_server: nil
       consul_client: {from: consul_client_link}
@@ -138,7 +133,6 @@ instance_groups:
   - name: consul_agent
     release: consul
     consumes:
-      consul: nil
       consul_common: {from: consul_common_link}
       consul_server: nil
       consul_client: {from: consul_client_link}
@@ -198,13 +192,11 @@ instance_groups:
   - name: consul_agent
     release: consul
     consumes:
-      consul: nil
       consul_common: {from: consul_common_link}
       consul_server: nil
       consul_client: {from: consul_client_link}
   - name: mysql
     release: cf-mysql
-    provides: {mysql-database: {as: db}}
     properties:
       network_name: default
       cf_mysql:
@@ -234,6 +226,7 @@ instance_groups:
           port: 33306
   - name: proxy
     release: cf-mysql
+    provides: {mysql-database: {as: db}}
     properties:
       cf_mysql:
         external_host: "((system_domain))"
@@ -241,11 +234,6 @@ instance_groups:
           api_password: "((cf_mysql_proxy_api_password))"
           consul_enabled: true
           consul_service_name: "sql-db"
-      nats:
-        machines: *nats_machines
-        password: "((nats_password))"
-        port: 4222
-        user: nats
   - name: metron_agent
     release: loggregator
     properties: *metron_agent_properties
@@ -264,7 +252,6 @@ instance_groups:
   - name: consul_agent
     release: consul
     consumes:
-      consul: nil
       consul_common: {from: consul_common_link}
       consul_server: nil
       consul_client: {from: consul_client_link}
@@ -328,7 +315,6 @@ instance_groups:
   - name: consul_agent
     release: consul
     consumes:
-      consul: nil
       consul_common: {from: consul_common_link}
       consul_server: nil
       consul_client: {from: consul_client_link}
@@ -359,7 +345,7 @@ instance_groups:
         scim:
           users:
           - name: admin
-            password: "((uaa_scim_users_admin_password))"
+            password: "((cf_admin_password))"
             groups:
             - cloud_controller.admin
             - doppler.firehose
@@ -409,23 +395,14 @@ instance_groups:
             authorized-grant-types: authorization_code
             autoapprove: true
             override: true
-            redirect-uri: "/login"
+            redirect-uri: "https://uaa.((system_domain))/login"
             scope: openid,cloud_controller.read,cloud_controller.write
             secret: "((uaa_clients_ssh-proxy_secret))"
-          tcp_emitter:
-            authorities: routing.routes.write,routing.routes.read,routing.router_groups.read
-            authorized-grant-types: client_credentials
-            secret: "((uaa_clients_tcp_emitter_secret))"
-          tcp_router:
-            authorities: routing.routes.read
-            authorized-grant-types: client_credentials
-            secret: "((uaa_clients_tcp_router_secret))"
           routing_api_client:
             authorities: routing.routes.write,routing.routes.read,routing.router_groups.read
             authorized-grant-types: client_credentials
             secret: "((uaa_clients_routing_api_client_secret))"
       uaadb:
-        address: sql-db.service.cf.internal
         databases:
         - name: uaa
           tag: uaa
@@ -482,7 +459,6 @@ instance_groups:
   - name: consul_agent
     release: consul
     consumes:
-      consul: nil
       consul_common: {from: consul_common_link}
       consul_server: nil
       consul_client: {from: consul_client_link}
@@ -534,7 +510,6 @@ instance_groups:
   - name: consul_agent
     release: consul
     consumes:
-      consul: nil
       consul_common: {from: consul_common_link}
       consul_server: nil
       consul_client: {from: consul_client_link}
@@ -657,7 +632,6 @@ instance_groups:
         databases:
         - name: cloud_controller
           tag: cc
-        address: sql-db.service.cf.internal
         db_scheme: mysql
         port: 3306
         roles:
@@ -708,8 +682,8 @@ instance_groups:
           type: tcp
           reservable_ports: 1024-1123
         sqldb:
-          type: mysql
           host: sql-db.service.cf.internal
+          type: mysql
           port: 3306
           schema: routing-api
           username: routing-api
@@ -732,7 +706,6 @@ instance_groups:
   - name: consul_agent
     release: consul
     consumes:
-      consul: nil
       consul_common: {from: consul_common_link}
       consul_server: nil
       consul_client: {from: consul_client_link}
@@ -767,6 +740,8 @@ instance_groups:
       app_domains: *app_domains
       routing_api:
         enabled: true
+      ssl:
+        skip_cert_verify: true
       uaa:
         ca_cert: "((uaa_ssl.ca))"
         clients:
@@ -796,7 +771,6 @@ instance_groups:
   - name: consul_agent
     release: consul
     consumes:
-      consul: nil
       consul_common: {from: consul_common_link}
       consul_server: nil
       consul_client: {from: consul_client_link}
@@ -849,7 +823,6 @@ instance_groups:
   - name: consul_agent
     release: consul
     consumes:
-      consul: nil
       consul_common: {from: consul_common_link}
       consul_server: nil
       consul_client: {from: consul_client_link}
@@ -905,7 +878,6 @@ instance_groups:
   - name: consul_agent
     release: consul
     consumes:
-      consul: nil
       consul_common: {from: consul_common_link}
       consul_server: nil
       consul_client: {from: consul_client_link}
@@ -974,7 +946,6 @@ instance_groups:
   - name: consul_agent
     release: consul
     consumes:
-      consul: nil
       consul_common: {from: consul_common_link}
       consul_server: nil
       consul_client: {from: consul_client_link}
@@ -1033,7 +1004,6 @@ instance_groups:
   - name: consul_agent
     release: consul
     consumes:
-      consul: nil
       consul_common: {from: consul_common_link}
       consul_server: nil
       consul_client: {from: consul_client_link}
@@ -1098,7 +1068,6 @@ instance_groups:
   - name: consul_agent
     release: consul
     consumes:
-      consul: nil
       consul_common: {from: consul_common_link}
       consul_server: nil
       consul_client: {from: consul_client_link}
@@ -1172,7 +1141,6 @@ instance_groups:
   - name: consul_agent
     release: consul
     consumes:
-      consul: nil
       consul_common: {from: consul_common_link}
       consul_server: nil
       consul_client: {from: consul_client_link}
@@ -1266,7 +1234,7 @@ variables:
   type: password
 - name: router_status_password
   type: password
-- name: uaa_scim_users_admin_password
+- name: cf_admin_password
   type: password
 - name: dropsonde_shared_secret
   type: password
@@ -1285,10 +1253,6 @@ variables:
 - name: uaa_clients_gorouter_secret
   type: password
 - name: uaa_clients_ssh-proxy_secret
-  type: password
-- name: uaa_clients_tcp_emitter_secret
-  type: password
-- name: uaa_clients_tcp_router_secret
   type: password
 - name: diego_bbs_encryption_keys_passphrase
   type: password
@@ -1531,94 +1495,94 @@ variables:
 
 releases:
 - name: binary-buildpack
-  url: https://bosh.io/d/github.com/cloudfoundry/binary-buildpack-release?v=1.0.11
-  version: 1.0.11
-  sha1: 09965333c3897aad5b935ec510382c8cbd9e5380
+  url: https://bosh.io/d/github.com/cloudfoundry/binary-buildpack-release?v=1.0.13
+  version: 1.0.13
+  sha1: f894e46d279cd965885f255439ea14188c48306d
 - name: capi
-  url: https://bosh.io/d/github.com/cloudfoundry/capi-release?v=1.28.0
-  version: 1.28.0
-  sha1: fe991d26110e03ab12773ab3c591065aa9367069
+  url: https://bosh.io/d/github.com/cloudfoundry/capi-release?v=1.30.0
+  version: 1.30.0
+  sha1: 508d842ffcb3fa1e5f5bacc28234be7462c3a5eb
 - name: cf-mysql
   url: https://bosh.io/d/github.com/cloudfoundry/cf-mysql-release?v=35
   version: "35"
   sha1: af8e2bd9b288f9efff8630463cbaa6101b655e29
 - name: cf-smoke-tests
-  url: https://bosh.io/d/github.com/cloudfoundry/cf-smoke-tests-release?v=21
-  version: "21"
-  sha1: b68080bf5d7498ed37984ec4634fb6d00d381f8f
+  url: https://bosh.io/d/github.com/cloudfoundry/cf-smoke-tests-release?v=26
+  version: "26"
+  sha1: 86c75490a9da5598396794019d67a0974d8dce89
 - name: cflinuxfs2
-  url: https://bosh.io/d/github.com/cloudfoundry/cflinuxfs2-release?v=1.119.0
-  version: 1.119.0
-  sha1: 137168703c94a5d62013eaecf8d2a23955dbc414
+  url: https://bosh.io/d/github.com/cloudfoundry/cflinuxfs2-release?v=1.130.0
+  version: 1.130.0
+  sha1: f2f253849f1df3d8ba694b5180fda7b40baad088
 - name: consul
-  url: https://bosh.io/d/github.com/cloudfoundry-incubator/consul-release?v=165
-  version: "165"
-  sha1: 9361d5bcb9fae10fc7f95bb3cb36845a83d70049
+  url: https://bosh.io/d/github.com/cloudfoundry-incubator/consul-release?v=170
+  version: "170"
+  sha1: 9a3d8138e785088f586bcedcc32fb82abdab120b
 - name: diego
-  url: https://bosh.io/d/github.com/cloudfoundry/diego-release?v=1.15.3
-  version: 1.15.3
-  sha1: 6b1eb84bb7af3a2c3cbcaa2e47f82d784610c3e7
+  url: https://bosh.io/d/github.com/cloudfoundry/diego-release?v=1.18.1
+  version: 1.18.1
+  sha1: 6c862da40ca7418a7defa47005de3d52e7a66948
 - name: dotnet-core-buildpack
-  url: https://bosh.io/d/github.com/cloudfoundry/dotnet-core-buildpack-release?v=1.0.15
-  version: 1.0.15
-  sha1: e281bf17afb62f4767c53e5d5a685436fa8755e1
+  url: https://bosh.io/d/github.com/cloudfoundry/dotnet-core-buildpack-release?v=1.0.19
+  version: 1.0.19
+  sha1: df1ae8e7a79b8f681145ccfc2a0b923d871eafb3
 - name: etcd
-  url: https://bosh.io/d/github.com/cloudfoundry-incubator/etcd-release?v=105
-  version: "105"
-  sha1: 444bde1b6d7ae10ea18008f7da45152da1c2b90e
+  url: https://bosh.io/d/github.com/cloudfoundry-incubator/etcd-release?v=112
+  version: "112"
+  sha1: c912b285e6f0ea2d3f84b73ab582f02778499a24
 - name: garden-runc
-  url: https://bosh.io/d/github.com/cloudfoundry/garden-runc-release?v=1.6.0
-  version: 1.6.0
-  sha1: 58fbc64aff303e6d76899441241dd5dacef50cb7
+  url: https://bosh.io/d/github.com/cloudfoundry/garden-runc-release?v=1.8.0
+  version: 1.8.0
+  sha1: 0c112d0bdcb52e61db7251e99b2a116982201c99
 - name: go-buildpack
-  url: https://bosh.io/d/github.com/cloudfoundry/go-buildpack-release?v=1.8.1
-  version: 1.8.1
-  sha1: be570b155fb8d0c9d04e9d9877b6da8ca1ffe6fd
+  url: https://bosh.io/d/github.com/cloudfoundry/go-buildpack-release?v=1.8.4
+  version: 1.8.4
+  sha1: dd37b5aa32e3f48e408f16704529ddf51789cfb2
 - name: java-buildpack
-  url: https://bosh.io/d/github.com/cloudfoundry/java-buildpack-release?v=3.16
-  version: "3.16"
-  sha1: 84e974747e4b2bd0a33fa579a63fe2c71526106a
+  url: https://bosh.io/d/github.com/cloudfoundry/java-buildpack-release?v=3.17
+  version: "3.17"
+  sha1: bf4da7197aa945ccf676847004e8523fcab97f4a
 - name: loggregator
-  url: https://bosh.io/d/github.com/cloudfoundry/loggregator?v=87
-  version: "87"
-  sha1: 18ae7a38ee8b28245047f6680df6da9f4b6b48c0
+  url: https://bosh.io/d/github.com/cloudfoundry/loggregator?v=89
+  version: "89"
+  sha1: 93af3cb98be40c0bc80916b1572f917585693494
 - name: nats
-  url: https://bosh.io/d/github.com/cloudfoundry/nats-release?v=16
-  version: "16"
-  sha1: d1314ce5339c590b2a34f339bf799a5d94c71666
+  url: https://bosh.io/d/github.com/cloudfoundry/nats-release?v=17
+  version: "17"
+  sha1: b7991f3b6b078ae91f4c70ccf57bb50ae7988178
 - name: nodejs-buildpack
-  url: https://bosh.io/d/github.com/cloudfoundry/nodejs-buildpack-release?v=1.5.32
-  version: 1.5.32
-  sha1: 8ee2510ddd806b254709ccfcf17a3ac108776d1f
+  url: https://bosh.io/d/github.com/cloudfoundry/nodejs-buildpack-release?v=1.5.36
+  version: 1.5.36
+  sha1: 759ec20ed42e4795dc0a49022e6a605cb9af2bec
 - name: php-buildpack
-  url: https://bosh.io/d/github.com/cloudfoundry/php-buildpack-release?v=4.3.31
-  version: 4.3.31
-  sha1: a76ebbe67f358f28f3a9076617e5073b5193645a
+  url: https://bosh.io/d/github.com/cloudfoundry/php-buildpack-release?v=4.3.34
+  version: 4.3.34
+  sha1: f76b6edf1adea38e984499c8047bc00fcd88ec66
 - name: python-buildpack
-  url: https://bosh.io/d/github.com/cloudfoundry/python-buildpack-release?v=1.5.18
-  version: 1.5.18
-  sha1: 31b931ebe29233ef7667f5f7bdcd903ede067a09
+  url: https://bosh.io/d/github.com/cloudfoundry/python-buildpack-release?v=1.5.19
+  version: 1.5.19
+  sha1: 4ab0f8d0fc0f93adbb2cfde53f1c93dc3c41a283
 - name: routing
-  url: https://bosh.io/d/github.com/cloudfoundry-incubator/cf-routing-release?v=0.152.0
-  version: 0.152.0
-  sha1: ea67ad087880fc0e492b6cce27fa2a25f977b691
+  url: https://bosh.io/d/github.com/cloudfoundry-incubator/cf-routing-release?v=0.157.0
+  version: 0.157.0
+  sha1: 2971343caa80bbed3fb504357617b9c4dcf755ab
 - name: ruby-buildpack
-  url: https://bosh.io/d/github.com/cloudfoundry/ruby-buildpack-release?v=1.6.37
-  version: 1.6.37
-  sha1: 2e18596659be8adc9648578dac7ddcfeadbc8d8b
+  url: https://bosh.io/d/github.com/cloudfoundry/ruby-buildpack-release?v=1.6.40
+  version: 1.6.40
+  sha1: e7b2fe89dd3677cf0b38bc4028226d68ac380bde
 - name: staticfile-buildpack
-  url: https://bosh.io/d/github.com/cloudfoundry/staticfile-buildpack-release?v=1.4.5
-  version: 1.4.5
-  sha1: 9256d01e09511bbc89bdb83eaa820cacec6eda38
+  url: https://bosh.io/d/github.com/cloudfoundry/staticfile-buildpack-release?v=1.4.6
+  version: 1.4.6
+  sha1: 6c1de462e54b8a658ad723cca4b1f0c1dd2360ae
 - name: statsd-injector
-  url: https://bosh.io/d/github.com/cloudfoundry/statsd-injector-release?v=1.0.25
-  version: 1.0.25
-  sha1: ff2fbf93aa451d02022d72cab1de8e58c7ea178c
+  url: https://bosh.io/d/github.com/cloudfoundry/statsd-injector-release?v=1.0.28
+  version: 1.0.28
+  sha1: 655c86c44731fb88c10dc3628d77dfb8ebd9da26
 - name: uaa
-  url: https://bosh.io/d/github.com/cloudfoundry/uaa-release?v=34
-  version: "34"
-  sha1: dcb2a2911c1592b2c582237e801fb5d0c7639674
+  url: https://bosh.io/d/github.com/cloudfoundry/uaa-release?v=41
+  version: "41"
+  sha1: a1b1818fb4f5e722a6c3073d364ce4c400e5fb31
 stemcells:
 - alias: default
   os: ubuntu-trusty
-  version: "3363.20"
+  version: "3421.6"

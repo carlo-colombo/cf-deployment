@@ -6,10 +6,6 @@
   - name: default
     static_ips: [10.244.0.34]
 
-# --- Remove unnecessary static ips for nats_machines ---
-- type: remove
-  path: /instance_groups/name=nats/networks/name=default/static_ips
-
 # --- Replace MySQL job with Postgres ---
 - type: replace
   path: /releases/-
@@ -18,6 +14,10 @@
     url: https://bosh.io/d/github.com/cloudfoundry/postgres-release?v=16
     sha1: b114fa78c017c7b6752e83c4d1e5d92309164e61
     version: "16"
+
+- type: replace
+  path: /instance_groups/name=cc-bridge/jobs/name=nsync/properties/capi/nsync/diego_privileged_containers?
+  value: true
 
 - type: remove
   path: /instance_groups/name=mysql/jobs/name=mysql
@@ -31,7 +31,7 @@
     provides: {postgres: {as: db}}
     properties:
       databases:
-        address: sql-db.service.internal
+        address: sql-db.service.cf.internal
         databases:
         - citext: true
           name: cloud_controller
@@ -74,7 +74,6 @@
   path: /instance_groups/name=api/jobs/name=cloud_controller_ng/properties/ccdb
   value: &ccdb
     db_scheme: postgres
-    address: sql-db.service.cf.internal
     roles:
     - tag: admin
       name: cloud_controller
@@ -99,7 +98,6 @@
   path: /instance_groups/name=uaa/jobs/name=uaa/properties/uaadb
   value:
     db_scheme: postgresql
-    address: sql-db.service.cf.internal
     roles:
     - tag: admin
       name: uaa

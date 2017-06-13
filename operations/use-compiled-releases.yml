@@ -1,18 +1,18 @@
 - path: /releases/name=cf-mysql/url
   type: replace
-  value: https://storage.googleapis.com/cf-deployment-compiled-releases/cf-mysql-35-ubuntu-trusty-3363.20-20170505-205025-018995745.tgz
+  value: https://storage.googleapis.com/cf-deployment-compiled-releases/cf-mysql-35-ubuntu-trusty-3421.6-20170612-202331-814489338.tgz
 - path: /releases/name=cf-mysql/version
   type: replace
   value: "35"
 - path: /releases/name=cf-mysql/sha1
   type: replace
-  value: 37b670a61c4fbbc6f2570a7adde4a9e7822e5a70
+  value: b1585946d9bfd2a94c39acdf7e02d980e08eaf59
 - path: /releases/name=capi/url
   type: replace
-  value: https://storage.googleapis.com/cf-deployment-compiled-releases/capi-1.28.0-ubuntu-trusty-3363.20-20170506-011340-468538037.tgz
+  value: https://storage.googleapis.com/cf-deployment-compiled-releases/capi-1.30.0-ubuntu-trusty-3421.6-20170612-215633-228996432.tgz
 - path: /releases/name=capi/version
   type: replace
-  value: 1.28.0
+  value: 1.30.0
 - path: /releases/name=capi/sha1
   type: replace
-  value: 80764edc7d15238698d95b5f0ff6ac1d18188528
+  value: fcb3f7ef40d23a132fcde4db31a662186d56cfe4

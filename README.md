@@ -73,12 +73,16 @@ about app availability during rolling deploys.
 When we think cf-deployment is ready,
 we'll update this section and make announcements on the cf-dev mailing list.
 
-**Migrating from cf-release:**
-The Release Integration team is still working on developing
-a migration path from cf-release.
-This use case is not sufficiently tested yet,
-and we don't advise anybody to attempt it
-until we develop the necessary tooling and guide.
+### Can I Transition from `cf-release`?
+A migration will be possible.
+It will be easier for some configurations
+than others.
+
+The Release Integration team
+is working on a transition path from `cf-release`.
+We don't advise anybody attempt the migration yet.
+Our in-progress tooling and documentation can be found at
+https://github.com/cloudfoundry/cf-deployment-transition
 
 ## <a name='deploying-cf'></a>Deploying CF
 
@@ -114,7 +118,7 @@ bosh -e my-env -d cf deploy cf-deployment/cf-deployment.yml \
 
 The CF Admin credentials will be stored in the file passed to the `--vars-store` flag
 (`env-repo/deployment.yml` in the example).
-You can find them by searching for `uaa_scim_users_admin_password`.
+You can find them by searching for `cf_admin_password`.
 
 If you're using a local bosh-lite,
 remember to add the `operations/bosh-lite.yml` ops-file
@@ -218,6 +222,9 @@ Here's an (alphabetical) summary:
   It's useful for deployments where tls termination is performed prior to the gorouter -
   for instance, on AWS, such termination is commonly done at the ELB.
   This also eliminates the need to specify `((router_ssl.certificate))` and `((router_ssl.private_key))` in the var files.
+- `operations/configure-default-router-group.yml` -
+  this file allows deployer to configure reservable ports for default tcp
+  router group by passing variable `default_router_group_reservable_ports`.
 - `operations/enable-privileged-container-support.yml` -
   enables diego privileged container support on cc-bridge.
   This opsfile might not be compatible with opsfiles
